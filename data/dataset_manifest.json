@@ -1,0 +1,26 @@
+{
+  "dataset": "Pipeline Defect Dataset",
+  "kaggle_identifier": "simplexitypipeline/pipeline-defect-dataset",
+  "local_root_example": "C:\\Users\\venne\\Downloads\\archive (7)\\images\\images\\train",
+  "tracked": false,
+  "reason": "Raw dataset is approximately 1.2 GB and must remain external to the repository.",
+  "audit": {
+    "total_images": 22120,
+    "total_annotation_files": 0,
+    "total_annotations": 0,
+    "image_formats": {
+      "jpeg": 22120
+    },
+    "mapping_matches_expected": false,
+    "class_distribution_available": false,
+    "training_ready": false
+  },
+  "expected_classes": {
+    "0": "Deformation",
+    "1": "Obstacle",
+    "2": "Rupture",
+    "3": "Disconnect",
+    "4": "Misalignment",
+    "5": "Deposition"
+  }
+}
