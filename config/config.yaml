@@ -1,0 +1,25 @@
+dataset:
+  root: C:/Users/venne/Downloads/archive (7)/images/images/train
+  yaml: data/dataset.yaml
+model:
+  name: yolo26s
+  weights: yolo26s.pt
+  image_size: 640
+  confidence: 0.60
+  iou: 0.50
+training:
+  epochs: 100
+  image_size: 640
+  batch_size: auto
+  patience: 20
+  pretrained: true
+  seed: 42
+tracking:
+  confirmation_frames: 3
+  iou_threshold: 0.30
+  max_age: 10
+simulation:
+  rover_speed_mps: 0.20
+storage:
+  root: inspection
+  database: events.db

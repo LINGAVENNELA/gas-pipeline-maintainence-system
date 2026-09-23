@@ -1,2 +1,38 @@
-# gas-pipeline-maintainence-system
-AI-powered gas pipeline maintenance rover using a Raspberry Pi, webcam, step sensor, and ultrasonic sensors. A YOLO-based model detects defects such as corrosion, rupture, deformation, and deposition in real time, records their location and confidence, saves only defect images, and provides live inspection updates and alerts.
+# Gas Pipeline Maintenance Rover ? Baseline V1
+
+Software-only pipeline inspection baseline. It supports the six-class Pipeline Defect Dataset (Deformation, Obstacle, Rupture, Disconnect, Misalignment, Deposition), YOLO training/evaluation, image/video inference, temporal confirmation, duplicate suppression, simulated distance, SQLite events, confirmed-image storage, replay, dashboard, and HTML reports. Existing project description is preserved in this expanded documentation.
+
+## Quick start
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate       # Windows
+pip install -r requirements.txt
+python training/dataset_audit.py --root "C:\Users\venne\Downloads\archive (7)\images\images\train"
+```
+
+The audit is read-only and writes `reports/dataset_audit.json` and `.csv`. It reports discovered facts only; this checkout's supplied external directory currently contains images without YOLO label files, so no class distribution is inferred. Do not train until annotations and mapping have been reviewed. Use `scripts/download_dataset.py` for Kaggle (credentials are required).
+
+## Training and evaluation
+
+Prepare/verify `data/dataset.yaml`, then run `python training/train.py [--model yolo26s.pt --epochs 100 --imgsz 640]`. Ultralytics is imported only when training/evaluation/inference is requested, with clear errors when unavailable. Evaluation writes only actual metrics to `reports/evaluation_metrics.json`; weights and run artifacts remain ignored.
+
+## Replay pipeline
+
+```bash
+python simulation/video_replay.py --source inspection.mp4 --weights models/best.pt
+python reports/generate_report.py --session SESSION_ID --database inspection/SESSION_ID/events.db
+streamlit run dashboard/app.py
+```
+
+A detection must persist for the configured number of frames (default three). One best-confidence frame is saved only after confirmation. Events explicitly use `distance_source: simulation`; no GPIO or Raspberry Pi dependency exists. `Obstacle` is detected, displayed, and logged but never drives motors. Interfaces in `simulation/hardware.py` are ready for later camera, encoder, and ultrasonic implementations.
+
+## Layout
+
+- `training/`: audit, train, evaluate
+- `inference/`: detector adapter, IoU tracker, confirmation/event manager
+- `simulation/`: encoder and video replay
+- `storage/`: SQLite and confirmed image store
+- `dashboard/`, `reports/`, `scripts/`, `tests/`
+
+Run tests with `python -m unittest discover -s tests` and compile checks with `python -m compileall .`. Raw data, models, caches, inspection output, secrets, and virtual environments are excluded by `.gitignore`.
