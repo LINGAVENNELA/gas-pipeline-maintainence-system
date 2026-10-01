@@ -1,77 +1,38 @@
-# Gas Pipeline Maintenance System
+# Gas Pipeline Maintenance Rover ? Baseline V1
 
-AI-powered gas pipeline inspection system for autonomous defect detection and maintenance monitoring. The project combines a YOLO object-detection pipeline with dataset validation, model training, live inference, and rover inspection workflows for identifying defects like deformation, rupture, misalignment, disconnects, obstacles, and deposition in pipeline infrastructure.
+Software-only pipeline inspection baseline. It supports the six-class Pipeline Defect Dataset (Deformation, Obstacle, Rupture, Disconnect, Misalignment, Deposition), YOLO training/evaluation, image/video inference, temporal confirmation, duplicate suppression, simulated distance, SQLite events, confirmed-image storage, replay, dashboard, and HTML reports. Existing project description is preserved in this expanded documentation.
 
-## What this project includes
+## Quick start
 
-- Dataset download integration for the baseline pipeline defect dataset
-- Dataset auditing and validation for YOLO annotation quality
-- Dataset preparation into a train/validation split for YOLOv8
-- Model training workflow for defect detection
-- Inference pipeline for images, directories, and video sources
-- Live webcam inspection loop for on-robot defect monitoring
-- Project structure ready for Raspberry Pi and camera-based robotic deployment
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python training/dataset_audit.py
+```
 
-## Repository layout
+The audit is read-only and writes `reports/dataset_audit.json` and `.csv`. The 22,120 JPEG images are stored under `data/raw/train` via Git LFS, but the supplied copy contains no YOLO label files, so no class distribution is inferred and training is blocked until labels are supplied. Dataset facts are recorded in `data/dataset_manifest.json`. Use `scripts/download_dataset.py` for Kaggle (credentials are required).
 
-- [scripts/download_dataset.py](scripts/download_dataset.py): downloads the source dataset into data/raw
-- [training/dataset_audit.py](training/dataset_audit.py): validates dataset labels, dimensions, classes, and annotation health
-- [training/prepare_dataset.py](training/prepare_dataset.py): converts the raw dataset into YOLO train/validation folders and writes data.yaml
-- [training/train_model.py](training/train_model.py): trains a YOLOv8 model on the prepared dataset
-- [inference/run_inference.py](inference/run_inference.py): runs inference against images or videos
-- [rover/inspection_loop.py](rover/inspection_loop.py): live camera inspection loop with alerting logic
-- [requirements.txt](requirements.txt): Python dependencies for training and inference
+## Training and evaluation
 
-## Getting started
+Prepare/verify `data/dataset.yaml`, then run `python training/train.py [--model yolov8s.pt --epochs 100 --imgsz 640]`. Ultralytics is imported only when training/evaluation/inference is requested, with clear errors when unavailable. Evaluation writes only actual metrics to `reports/evaluation_metrics.json`; weights and run artifacts remain ignored.
 
-1. Create and activate a Python environment.
-2. Install dependencies:
+## Replay pipeline
 
-   pip install -r requirements.txt
+```bash
+python simulation/video_replay.py --source inspection.mp4 --weights models/best.pt
+python reports/generate_report.py --session SESSION_ID --database inspection/SESSION_ID/events.db
+streamlit run dashboard/app.py
+```
 
-3. Download the dataset:
+A detection must persist for the configured number of frames (default three). One best-confidence frame is saved only after confirmation. Events explicitly use `distance_source: simulation`; no GPIO or Raspberry Pi dependency exists. `Obstacle` is detected, displayed, and logged but never drives motors. Interfaces in `simulation/hardware.py` are ready for later camera, encoder, and ultrasonic implementations.
 
-   python scripts/download_dataset.py
+## Layout
 
-4. Audit the dataset:
+- `training/`: audit, train, evaluate
+- `inference/`: detector adapter, IoU tracker, confirmation/event manager
+- `simulation/`: encoder and video replay
+- `storage/`: SQLite and confirmed image store
+- `dashboard/`, `reports/`, `scripts/`, `tests/`
 
-   python training/dataset_audit.py --dataset data/raw
-
-5. Prepare the dataset for training:
-
-   python training/prepare_dataset.py --dataset data/raw --output data/processed
-
-6. Train the defect detection model:
-
-   python training/train_model.py --dataset data/processed/data.yaml --epochs 50 --imgsz 640
-
-7. Run inference on an image or directory:
-
-   python inference/run_inference.py --source data/raw --weights training_outputs/pipeline_defects/weights/best.pt
-
-8. Launch the live rover inspection loop:
-
-   python rover/inspection_loop.py --weights training_outputs/pipeline_defects/weights/best.pt --camera-index 0
-
-## Expected defect classes
-
-The baseline project uses the following labels:
-
-- 0: Deformation
-- 1: Obstacle
-- 2: Rupture
-- 3: Disconnect
-- 4: Misalignment
-- 5: Deposition
-
-## Outputs
-
-- Dataset reports are written to the reports directory.
-- Prepared training data is saved under data/processed.
-- Model checkpoints are stored under training_outputs.
-- Inference results are stored under inspection.
-
-## Notes
-
-- This repository is designed for practical pipeline inspection work and can be extended to Raspberry Pi hardware integration, trained model deployment, alerting, and autonomous navigation.
-- The live rover workflow is structured for camera-based inspection and can be connected to GPIO-controlled movement and sensor modules as hardware is added.
+Run tests with `python -m unittest discover -s tests` and compile checks with `python -m compileall .`. Raw data, models, caches, inspection output, secrets, and virtual environments are excluded by `.gitignore`.
