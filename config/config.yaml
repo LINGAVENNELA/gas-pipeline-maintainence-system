@@ -1,5 +1,5 @@
 dataset:
-  root: C:/Users/venne/Downloads/archive (7)/images/images/train
+  root: data/raw/train
   yaml: data/dataset.yaml
 model:
   name: yolo26s

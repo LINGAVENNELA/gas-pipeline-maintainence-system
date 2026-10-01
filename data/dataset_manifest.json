@@ -1,9 +1,11 @@
 {
   "dataset": "Pipeline Defect Dataset",
   "kaggle_identifier": "simplexitypipeline/pipeline-defect-dataset",
-  "local_root_example": "C:\\Users\\venne\\Downloads\\archive (7)\\images\\images\\train",
-  "tracked": false,
-  "reason": "Raw dataset is approximately 1.2 GB and must remain external to the repository.",
+  "repository_root": "data/raw/train",
+  "tracked": true,
+  "storage": "Git LFS",
+  "size_bytes": 1292073488,
+  "reason": "Raw images were explicitly added through Git LFS at user request.",
   "audit": {
     "total_images": 22120,
     "total_annotation_files": 0,

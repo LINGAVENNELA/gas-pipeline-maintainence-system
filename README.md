@@ -11,7 +11,7 @@ pip install -r requirements.txt
 python training/dataset_audit.py --root "C:\Users\venne\Downloads\archive (7)\images\images\train"
 ```
 
-The audit is read-only and writes `reports/dataset_audit.json` and `.csv`. It reports discovered facts only; this checkout's supplied external directory currently contains 22,120 images without YOLO label files, so no class distribution is inferred. The compact integration facts are tracked in `data/dataset_manifest.json`; raw images remain external. Do not train until annotations and mapping have been reviewed. Use `scripts/download_dataset.py` for Kaggle (credentials are required).
+The audit is read-only and writes `reports/dataset_audit.json` and `.csv`. The 22,120 JPEG images are stored under `data/raw/train` via Git LFS, but the supplied copy contains no YOLO label files, so no class distribution is inferred and training is blocked until labels are supplied. Dataset facts are recorded in `data/dataset_manifest.json`. Use `scripts/download_dataset.py` for Kaggle (credentials are required).
 
 ## Training and evaluation
 
