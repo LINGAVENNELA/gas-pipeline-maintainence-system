@@ -15,7 +15,7 @@ The audit is read-only and writes `reports/dataset_audit.json` and `.csv`. The 2
 
 ## Training and evaluation
 
-Prepare/verify `data/dataset.yaml`, then run `python training/train.py [--model yolov8s.pt --epochs 100 --imgsz 640]`. Ultralytics is imported only when training/evaluation/inference is requested, with clear errors when unavailable. Evaluation writes only actual metrics to `reports/evaluation_metrics.json`; weights and run artifacts remain ignored.
+Prepare/verify `data/dataset.yaml`, then run `python training/train.py [--model yolo26s.pt --epochs 100 --imgsz 640]`. Ultralytics is imported only when training/evaluation/inference is requested, with clear errors when unavailable. Evaluation writes only actual metrics to `reports/evaluation_metrics.json`; weights and run artifacts remain ignored.
 
 ## Replay pipeline
 
